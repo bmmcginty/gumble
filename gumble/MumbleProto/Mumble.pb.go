@@ -36,7 +36,7 @@ It has these top-level messages:
 	ServerConfig
 	SuggestConfig
 */
-package MumbleProto // import "layeh.com/gumble/gumble/MumbleProto"
+package MumbleProto // import "github.com/bmmcginty/gumble/gumble/MumbleProto"
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"

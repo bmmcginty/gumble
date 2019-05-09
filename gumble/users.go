@@ -1,5 +1,7 @@
 package gumble
-
+import(
+//	"github.com/timshannon/go-openal/openal"
+)
 // Users is a map of server users.
 //
 // When accessed through client.Users, it contains all users currently on the

@@ -1,17 +1,28 @@
-package gumbleopenal // import "layeh.com/gumble/gumbleopenal"
+package gumbleopenal // import "github.com/bmmcginty/gumble/gumbleopenal"
 
 import (
 	"encoding/binary"
 	"errors"
 	"time"
+"os/exec"
 
-	"layeh.com/gumble/gumble"
+	"github.com/bmmcginty/gumble/gumble"
 	"github.com/timshannon/go-openal/openal"
 )
 
 var (
 	ErrState = errors.New("gumbleopenal: invalid state")
 )
+
+func beep() {
+	cmd := exec.Command("beep")
+	cmdout, err := cmd.Output()
+	if err != nil {
+		panic(err)
+	}
+	if cmdout != nil {
+	}
+}
 
 type Stream struct {
 	client *gumble.Client
@@ -78,8 +89,10 @@ func (s *Stream) StopSource() error {
 }
 
 func (s *Stream) OnAudioStream(e *gumble.AudioStreamEvent) {
-	go func() {
-		source := openal.NewSource()
+	go func(e *gumble.AudioStreamEvent) {
+		var source = openal.NewSource()
+e.User.AudioSource=source
+//source := e.User.AudioSource
 		emptyBufs := openal.NewBuffers(8)
 		reclaim := func() {
 			if n := source.BuffersProcessed(); n > 0 {
@@ -113,7 +126,8 @@ func (s *Stream) OnAudioStream(e *gumble.AudioStreamEvent) {
 		reclaim()
 		emptyBufs.Delete()
 		source.Delete()
-	}()
+beep()
+	}(e)
 }
 
 func (s *Stream) sourceRoutine() {

@@ -28,7 +28,7 @@
 // for transmitting and receiving audio. It can be enabled by importing the
 // following package for its side effect:
 //  import (
-//      _ "layeh.com/gumble/opus"
+//      _ "github.com/bmmcginty/gumble/opus"
 //  )
 //
 // To ensure that gumble clients can always transmit and receive audio to and
@@ -42,4 +42,4 @@
 // (Users, Channels, Config, etc.), is thread-unsafe. Accessing or modifying
 // those structures should only be done from inside of an event listener or via
 // Client.Do.
-package gumble // import "layeh.com/gumble/gumble"
+package gumble // import "github.com/bmmcginty/gumble/gumble"
