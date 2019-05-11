@@ -12,6 +12,8 @@ type Config struct {
 	// Password used when authenticating with the server. A password is not
 	// usually required to connect to a server.
 	Password string
+//the address to use
+Address string
 	// The initial access tokens to the send to the server. Access tokens can be
 	// resent to the server using:
 	//  client.Send(config.Tokens)

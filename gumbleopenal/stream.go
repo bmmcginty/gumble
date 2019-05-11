@@ -12,6 +12,7 @@ import (
 
 var (
 	ErrState = errors.New("gumbleopenal: invalid state")
+	ErrMic = errors.New("gumbleopenal: microphone disconnected or misconfigured")
 )
 
 func beep() {
@@ -43,6 +44,8 @@ func New(client *gumble.Client) (*Stream, error) {
 	}
 
 	s.deviceSource = openal.CaptureOpenDevice("", gumble.AudioSampleRate, openal.FormatMono16, uint32(s.sourceFrameSize))
+if s.deviceSource==nil {
+}
 
 	s.deviceSink = openal.OpenDevice("")
 	s.contextSink = s.deviceSink.CreateContext()
@@ -56,8 +59,10 @@ func New(client *gumble.Client) (*Stream, error) {
 func (s *Stream) Destroy() {
 	s.link.Detach()
 	if s.deviceSource != nil {
+if s.deviceSource!= nil {
 		s.StopSource()
 		s.deviceSource.CaptureCloseDevice()
+}
 		s.deviceSource = nil
 	}
 	if s.deviceSink != nil {
@@ -72,19 +77,26 @@ func (s *Stream) StartSource() error {
 	if s.sourceStop != nil {
 		return ErrState
 	}
-	s.deviceSource.CaptureStart()
+if s.deviceSource==nil {
+return ErrMic
+} else {
+ 	s.deviceSource.CaptureStart()
 	s.sourceStop = make(chan bool)
 	go s.sourceRoutine()
+}
 	return nil
 }
 
 func (s *Stream) StopSource() error {
+if s.deviceSource==nil {
+return ErrMic
+}
+	s.deviceSource.CaptureStop()
 	if s.sourceStop == nil {
 		return ErrState
 	}
 	close(s.sourceStop)
 	s.sourceStop = nil
-	s.deviceSource.CaptureStop()
 	return nil
 }
 
@@ -126,7 +138,6 @@ e.User.AudioSource=source
 		reclaim()
 		emptyBufs.Delete()
 		source.Delete()
-beep()
 	}(e)
 }
 

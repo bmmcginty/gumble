@@ -55,6 +55,10 @@ type User struct {
  volume float32
 }
 
+func (u *User) GetClient() *Client {
+return u.client
+}
+
 // SetTexture sets the user's texture.
 func (u *User) SetTexture(texture []byte) {
 	packet := MumbleProto.UserState{

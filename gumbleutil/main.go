@@ -42,7 +42,7 @@ func Main(listeners ...gumble.EventListener) {
 	config := gumble.NewConfig()
 	config.Username = *username
 	config.Password = *password
-	address := net.JoinHostPort(host, port)
+	config.Address = net.JoinHostPort(host, port)
 
 	var tlsConfig tls.Config
 
@@ -69,7 +69,7 @@ func Main(listeners ...gumble.EventListener) {
 			keepAlive <- true
 		},
 	})
-	_, err = gumble.DialWithDialer(new(net.Dialer), address, config, &tlsConfig)
+	_, err = gumble.DialWithDialer(new(net.Dialer), config, &tlsConfig)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s: %s\n", os.Args[0], err)
 		os.Exit(1)

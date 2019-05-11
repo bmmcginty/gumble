@@ -77,12 +77,12 @@ type Client struct {
 	disconnectEvent DisconnectEvent
 }
 
-// Dial is an alias of DialWithDialer(new(net.Dialer), addr, config, nil).
-func Dial(addr string, config *Config) (*Client, error) {
-	return DialWithDialer(new(net.Dialer), addr, config, nil)
+// Dial is an alias of DialWithDialer(new(net.Dialer), config, nil).
+func Dial(config *Config) (*Client, error) {
+	return DialWithDialer(new(net.Dialer), config, nil)
 }
 
-// DialWithDialer connects to the Mumble server at the given address.
+// DialWithDialer connects to the Mumble server at the address given in config.
 //
 // The function returns after the connection has been established, the initial
 // server information has been synced, and the OnConnect handlers have been
@@ -91,10 +91,10 @@ func Dial(addr string, config *Config) (*Client, error) {
 // nil and an error is returned if server synchronization does not complete by
 // min(time.Now() + dialer.Timeout, dialer.Deadline), or if the server rejects
 // the client.
-func DialWithDialer(dialer *net.Dialer, addr string, config *Config, tlsConfig *tls.Config) (*Client, error) {
+func DialWithDialer(dialer *net.Dialer, config *Config, tlsConfig *tls.Config) (*Client, error) {
 	start := time.Now()
 
-	conn, err := tls.DialWithDialer(dialer, "tcp", addr, tlsConfig)
+	conn, err := tls.DialWithDialer(dialer, "tcp", config.Address, tlsConfig)
 	if err != nil {
 		return nil, err
 	}
