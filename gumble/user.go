@@ -51,8 +51,8 @@ type User struct {
 	client  *Client
 	decoder AudioDecoder
 
- AudioSource openal.Source
- volume float32
+ AudioSource *openal.Source
+ Volume float32
 }
 
 func (u *User) GetClient() *Client {

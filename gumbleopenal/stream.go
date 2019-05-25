@@ -103,7 +103,8 @@ return ErrMic
 func (s *Stream) OnAudioStream(e *gumble.AudioStreamEvent) {
 	go func(e *gumble.AudioStreamEvent) {
 		var source = openal.NewSource()
-e.User.AudioSource=source
+e.User.AudioSource=&source
+e.User.AudioSource.SetGain(e.User.Volume)
 //source := e.User.AudioSource
 		emptyBufs := openal.NewBuffers(8)
 		reclaim := func() {
