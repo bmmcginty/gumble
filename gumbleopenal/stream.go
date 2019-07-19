@@ -31,6 +31,7 @@ type Stream struct {
 
 	deviceSource    *openal.CaptureDevice
 	sourceFrameSize int
+micVolume float32
 	sourceStop      chan bool
 
 	deviceSink  *openal.Device
@@ -98,6 +99,27 @@ return ErrMic
 	close(s.sourceStop)
 	s.sourceStop = nil
 	return nil
+}
+
+func (s *Stream) GetMicVolume() float32 {
+return s.micVolume
+//deviceSource.GetGain()
+}
+
+func (s *Stream) SetMicVolume(change float32, relative bool) {
+var val float32
+if relative {
+val=s.GetMicVolume()+change
+} else {
+val=change
+}
+if val>=1 {
+val=1.0
+}
+if val<=0 {
+val=0
+}
+s.micVolume=val
 }
 
 func (s *Stream) OnAudioStream(e *gumble.AudioStreamEvent) {
@@ -171,7 +193,8 @@ func (s *Stream) sourceRoutine() {
 			}
 			int16Buffer := make([]int16, frameSize)
 			for i := range int16Buffer {
-				int16Buffer[i] = int16(binary.LittleEndian.Uint16(buff[i*2 : (i+1)*2]))
+int16Buffer[i] = int16(binary.LittleEndian.Uint16(buff[i*2 : (i+1)*2])) 
+//				int16Buffer[i] = int16(float32(binary.LittleEndian.Uint16(buff[i*2 : (i+1)*2]))*s.micVolume)
 			}
 			outgoing <- gumble.AudioBuffer(int16Buffer)
 		}
