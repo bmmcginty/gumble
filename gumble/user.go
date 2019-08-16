@@ -3,7 +3,7 @@ package gumble
 import (
 	"github.com/golang/protobuf/proto"
 	"github.com/bmmcginty/gumble/gumble/MumbleProto"
-"github.com/timshannon/go-openal/openal"
+"github.com/bmmcginty/go-openal/openal"
 )
 
 // User represents a user that is currently connected to the server.

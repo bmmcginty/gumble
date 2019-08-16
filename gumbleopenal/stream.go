@@ -7,12 +7,14 @@ import (
 	"time"
 
 	"github.com/bmmcginty/gumble/gumble"
-	"github.com/timshannon/go-openal/openal"
+	"github.com/bmmcginty/go-openal/openal"
 )
 
 var (
 	ErrState = errors.New("gumbleopenal: invalid state")
 	ErrMic   = errors.New("gumbleopenal: microphone disconnected or misconfigured")
+	ErrInputDevice = errors.New("gumbleopenal: invalid input device or parameters")
+	ErrOutputDevice = errors.New("gumbleopenal: invalid output device or parameters")
 )
 
 func beep() {
@@ -38,32 +40,64 @@ type Stream struct {
 	contextSink *openal.Context
 }
 
-func New(client *gumble.Client, inputDevice *string, outputDevice *string) (*Stream, error) {
+func New(client *gumble.Client, inputDevice *string, outputDevice *string, test bool) (*Stream, error) {
+frmsz := 480
+if !test {
+frmsz = client.Config.AudioFrameSize()
+}
+
+idev := openal.CaptureOpenDevice(*inputDevice, gumble.AudioSampleRate, openal.FormatMono16, uint32(frmsz))
+	if idev == nil {
+return nil,ErrInputDevice
+	}
+
+odev := openal.OpenDevice(*outputDevice)
+if odev==nil {
+idev.CaptureCloseDevice()
+return nil,ErrOutputDevice
+}
+
+if test {
+idev.CaptureCloseDevice()
+odev.CloseDevice()
+return nil,nil
+}
+
 	s := &Stream{
 		client:          client,
-		sourceFrameSize: client.Config.AudioFrameSize(),
+		sourceFrameSize: frmsz,
 	}
 
-	s.deviceSource = openal.CaptureOpenDevice(*inputDevice, gumble.AudioSampleRate, openal.FormatMono16, uint32(s.sourceFrameSize))
-	if s.deviceSource == nil {
-	}
+	s.deviceSource = idev
+if s.deviceSource==nil {
+return nil,ErrInputDevice
+}
 
-	s.deviceSink = openal.OpenDevice(*outputDevice)
+	s.deviceSink = odev
+if s.deviceSink==nil {
+return nil,ErrOutputDevice
+}
 	s.contextSink = s.deviceSink.CreateContext()
+if s.contextSink == nil {
+s.Destroy();
+return nil,ErrOutputDevice
+}
 	s.contextSink.Activate()
-
-	s.link = client.Config.AttachAudio(s)
 
 	return s, nil
 }
 
+func (s *Stream) AttachStream(client *gumble.Client) {
+	s.link = client.Config.AttachAudio(s)
+}
+
 func (s *Stream) Destroy() {
+if(s.link!=nil) {
 	s.link.Detach()
+}
 	if s.deviceSource != nil {
-		if s.deviceSource != nil {
 			s.StopSource()
 			s.deviceSource.CaptureCloseDevice()
-		}
 		s.deviceSource = nil
 	}
 	if s.deviceSink != nil {
