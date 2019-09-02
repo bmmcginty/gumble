@@ -52,6 +52,7 @@ type User struct {
 	decoder AudioDecoder
 
  AudioSource *openal.Source
+Boost uint16
  Volume float32
 }
 

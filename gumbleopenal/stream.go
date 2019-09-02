@@ -172,12 +172,14 @@ func (s *Stream) OnAudioStream(e *gumble.AudioStreamEvent) {
 		}
 		var raw [gumble.AudioMaximumFrameSize * 2]byte
 		for packet := range e.C {
+var boost uint16 = uint16(1)
 			samples := len(packet.AudioBuffer)
 			if samples > cap(raw) {
 				continue
 			}
+boost=e.User.Boost
 			for i, value := range packet.AudioBuffer {
-				binary.LittleEndian.PutUint16(raw[i*2:], uint16(value))
+				binary.LittleEndian.PutUint16(raw[i*2:], uint16(value)*boost)
 			}
 			reclaim()
 			if len(emptyBufs) == 0 {
@@ -228,7 +230,6 @@ func (s *Stream) sourceRoutine(inputDevice *string) {
 			int16Buffer := make([]int16, frameSize)
 			for i := range int16Buffer {
 				int16Buffer[i] = int16(binary.LittleEndian.Uint16(buff[i*2 : (i+1)*2]))
-				//				int16Buffer[i] = int16(float32(binary.LittleEndian.Uint16(buff[i*2 : (i+1)*2]))*s.micVolume)
 			}
 			outgoing <- gumble.AudioBuffer(int16Buffer)
 		}
